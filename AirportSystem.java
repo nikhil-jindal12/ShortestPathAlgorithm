@@ -1,9 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.PriorityQueue;
-import java.util.Comparator;
-import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Iterator;
 public class AirportSystem {
 
     /**
@@ -11,7 +9,9 @@ public class AirportSystem {
      * Each node is a city, and each connecting line indicates a flight between two cities
      * The inner List<Edge> represents a vertex
      */
-    private List<Vertex> connections;
+    private List<Vertex> connections = new ArrayList<Vertex>();
+
+    private LinkedList<Integer> adjacents[];
 
     /**
      * Adds a new edge to the connections list
@@ -22,19 +22,25 @@ public class AirportSystem {
      * @return true if the edge was successfully added
      */
     public boolean addEdge(String source, String destination, int weight) {
+        
+        // return false if the weight is negative or the edge already exists
         if (weight < 0) {
             return false;
         } else {
             for (Vertex vertex : connections) {
-                if (vertex.id.equals(source)) {
+                if (vertex.edges.toString().equals("[" + source + ", " + destination + "]")) {
                     return false;
                 }
             }
         }
 
+        // Add 2 Vertices and edges to/from each Vertex
         List<Edge> temp = new ArrayList<Edge>();
         temp.add(new Edge(source, destination, weight));
         connections.add(new Vertex(source, temp));
+        temp.clear();
+        temp.add(new Edge(destination, source, weight));
+        connections.add(new Vertex(destination, temp));
         return true;
     }
 
@@ -45,32 +51,9 @@ public class AirportSystem {
      * @return the shortest distance between city A and city B
      */
     public int shortestDistance(String cityA, String cityB) {
-        PriorityQueue<Vertex> pq = new PriorityQueue<Vertex>();
-        Set<String> visited = new HashSet<String>();
-        for (Vertex vertex : connections) {
-            if (vertex.id.equals(cityA)) {
-                pq.add(vertex);
-            }
-        }
-        while (!pq.isEmpty()) {
-            Vertex current = pq.poll();
-            if (current.id.equals(cityB)) {
-                return current.distance;
-            }
+        
+        
 
-
-            visited.add(current.id);
-            for (Edge edge : current.edges) {
-                if (!visited.contains(edge.destination)) {
-                    for (Vertex vertex : connections) {
-                        if (vertex.id.equals(edge.destination)) {
-                            pq.add(vertex);
-                        }
-                    }
-                }
-            }
-        }
-        return 0;
     }
 
     /**
@@ -89,6 +72,46 @@ public class AirportSystem {
      * @return a list of String representing the cities from the start using BFS
      */
     public List<String> breadthFirstSearch(String start) {
+
+        adjacents = new LinkedList[connections.size()];
+
+        for (int i = 0; i < connections.size(); ++i) {
+            adjacents[i] = new LinkedList();
+        }
+
+        List<String> cities = new ArrayList<>();
+
+        boolean visited[] = new boolean[connections.size()];
+
+        LinkedList<String> queue = new LinkedList<>();
+
+        for (int i = 0; i < visited.length; i++) {
+            visited[i] = false;
+        }
+
+        for (Vertex vertex : connections) {
+            if (vertex.id == start) {
+                queue.add(vertex.id);
+                visited[connections.indexOf(vertex)] = true;
+            }
+        }
+
+        while (queue.size() != 0) {
+            String city = queue.poll();
+            cities.add(city);
+            
+            // I don't think queue is right because queue will keep changing for indices?
+            Iterator<Integer> i = adjacents[queue.indexOf(city)].listIterator();
+            while (i.hasNext()) {
+                int index = i.next();
+                if (!visited[index]) {
+                    queue.add(connections.get(index).id);
+                    visited[index] = true;
+                }
+            }
+        }
+
+        return cities;
 
     }
     
