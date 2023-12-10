@@ -1,11 +1,19 @@
 import org.junit.*;
 import static org.junit.Assert.*;
 
+/**
+ * JUnit testing class for the AirportSystem class
+ * @author Nikhil Jindal
+ */
 public class AirportSystemTesting {
 
+    // create a new airport instance to test methods on
     AirportSystem airport = new AirportSystem();
 
     @Test
+    /**
+     * Tests the shortestDistance method of the AirportSystem
+     */
     public void testShortestDistance() {
         
         airport.addEdge("Chicago", "New York", 10);
@@ -28,6 +36,9 @@ public class AirportSystemTesting {
     }
 
     @Test
+    /**
+     * Tests the minimumSpanningTree() method of the AirportSystem
+     */
     public void testMinimumSpanningTree() {
 
         airport.addEdge("Chicago", "New York", 10);
